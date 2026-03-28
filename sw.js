@@ -1,40 +1,46 @@
-const cacheName = 'hsc26-v2'; // Version change kora hoyeche jate update hoy
-const staticAssets = [
-  '/hsc26masterplannar/',
-  '/hsc26masterplannar/index.html',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap'
+const CACHE_NAME = 'hsc-planner-v1';
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      return cache.addAll(staticAssets);
+// Install Event - Caching assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(keys.filter(key => key !== cacheName).map(key => caches.delete(key)));
+// Activate Event - Cleaning up old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
     })
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cachedResponse => {
-      return cachedResponse || fetch(e.request).then(networkResponse => {
-        return caches.open(cacheName).then(cache => {
-          // Network theke data asle cache-e update kore rakha
-          if (e.request.url.startsWith('http')) {
-             cache.put(e.request, networkResponse.clone());
-          }
-          return networkResponse;
-        });
-      });
-    }).catch(() => caches.match('/hsc26masterplannar/index.html'))
+// Fetch Event - Serving from cache when offline
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    }).catch(() => {
+      // If offline and request fails, return index.html
+      return caches.match('./index.html');
+    })
   );
 });
