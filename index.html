@@ -85,8 +85,21 @@
         .col-bio { width: 90px; }
         .col-done { width: 45px; }
 
-        .t-cell, .col-bio { cursor: grab; padding: 10px 8px; }
-        .drag-over { background: rgba(56, 189, 248, 0.15) !important; outline: 1px dashed var(--accent); }
+        .t-cell, .col-bio { 
+            cursor: grab; 
+            padding: 10px 8px; 
+            transition: opacity 0.15s ease-in-out, transform 0.2s ease, background 0.2s ease; 
+        }
+        .t-cell:active, .col-bio:active { 
+            cursor: grabbing; 
+            opacity: 0.6; 
+            transform: scale(0.95); 
+        }
+        .drag-over { 
+            background: rgba(56, 189, 248, 0.15) !important; 
+            outline: 1px dashed var(--accent); 
+            transform: scale(1.03); 
+        }
 
         .month-row { background: #1e3a8a; color: #fff; font-weight: 800; text-align: center; font-size: 12px; }
         tr.done { background: rgba(16, 185, 129, 0.04); color: var(--sub); }
@@ -280,9 +293,20 @@
 
     window.addEventListener('dragover', (e) => {
         if (!draggedSource) return;
-        if (e.clientY < 150) scrollSpeed = -15; 
-        else if (window.innerHeight - e.clientY < 100) scrollSpeed = 15;
-        else scrollSpeed = 0;
+        e.preventDefault(); // স্মুথ ড্রপের জন্য এটা জরুরি
+
+        const edge = 150; // স্ক্রিনের কত কাছে গেলে স্ক্রোল শুরু হবে
+        const speedMultiplier = 20; // ম্যাক্সিমাম স্পিড
+
+        // ডায়নামিক স্পিড ক্যালকুলেশন (কাছে গেলে স্পিড বাড়বে)
+        if (e.clientY < edge) {
+            scrollSpeed = -Math.max(1, speedMultiplier * (1 - e.clientY / edge));
+        } else if (window.innerHeight - e.clientY < edge) {
+            scrollSpeed = Math.max(1, speedMultiplier * (1 - (window.innerHeight - e.clientY) / edge));
+        } else {
+            scrollSpeed = 0;
+        }
+
         if (scrollSpeed !== 0 && !scrollAnimationFrame) startAutoScroll();
         else if (scrollSpeed === 0 && scrollAnimationFrame) { cancelAnimationFrame(scrollAnimationFrame); scrollAnimationFrame = null; }
     });
@@ -587,7 +611,7 @@
             return; 
         }
 
-        if (state.done[targetId]) { showToast("Cannot move tasks to a completed day! 🚫"); return; }
+        if (state.done[targetId]) { showToast("Cannot move tasks to a completed day! 🚫", true); return; }
         
         let sDay, tDay;
         state.tasks.forEach(m => m.d.forEach(d => { 
@@ -596,13 +620,37 @@
         }));
 
         if (sDay && tDay) {
+            // ডাটা সোয়াপ
             const temp = sDay[draggedSource.field];
             sDay[draggedSource.field] = tDay[targetField];
             tDay[targetField] = temp;
+
+            // নতুন ডাটাগুলো লোকাল ভেরিয়েবলে সেভ করে রাখা হচ্ছে যেন null হয়ে না যায়
+            const newSourceText = sDay[draggedSource.field];
+            const newTargetText = tDay[targetField];
+
+            // DOM আপডেট
+            const sourceCell = document.querySelector(`td[data-id="${draggedSource.id}"][data-field="${draggedSource.field}"]`);
+            
+            if (sourceCell) {
+                sourceCell.style.opacity = '0';
+                targetCell.style.opacity = '0';
+
+                // অ্যানিমেশন টাইমার
+                setTimeout(() => {
+                    sourceCell.innerHTML = newSourceText;
+                    targetCell.innerHTML = newTargetText;
+                    
+                    sourceCell.style.opacity = '1';
+                    targetCell.style.opacity = '1';
+                }, 150); 
+            }
+
             save(); 
-            init(false); 
             showToast("Tasks Swapped! 🔄");
         }
+        
+        // সব কাজ শেষে draggedSource ক্লিয়ার করা হচ্ছে
         draggedSource = null;
     }
 
