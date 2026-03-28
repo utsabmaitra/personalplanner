@@ -1,15 +1,24 @@
 {
   "name": "HSC 26 Masterplannar",
   "short_name": "Plannar26",
-  "start_url": "index.html",
+  "description": "Premium Study Planner for HSC 2026",
+  "start_url": "/hsc26masterplannar/index.html",
   "display": "standalone",
   "background_color": "#0b1120",
   "theme_color": "#38bdf8",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/5968/5968267.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968267.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
