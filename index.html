@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -617,16 +616,6 @@
     }
 
     init(true);
-</script>
-<link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("Offline Mode Ready! ✅"))
-        .catch(() => console.log("Offline Mode Failed! ❌"));
-    });
-  }
 </script>
 </body>
 </html>
