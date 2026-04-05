@@ -612,6 +612,7 @@ function playSfx(type) {
     }
 
     function startTimer() {
+        if (state.activeId) return;
         const nextId = findNext();
         if (nextId) {
             state.activeId = nextId; state.startTime = Date.now();
