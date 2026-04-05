@@ -565,9 +565,17 @@
         if (missedCount > 0) showToast(`You missed ${missedCount} days! 🔴`, true);
     }
 
+
     function startTimer() {
         const nextId = findNext();
         if (nextId) {
+            // ওরিয়েন্টেশন আনলক করার কোড (ইউজার ক্লিক ইন্টারঅ্যাকশন হিসেবে)
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock().catch(function(error) {
+                    console.log("Orientation unlock error: ", error);
+                });
+            }
+
             state.activeId = nextId; state.startTime = Date.now();
             save(); updateButtonUI(true);
             
@@ -599,7 +607,7 @@
     function showToast(msg, isRed = false) {
     const t = document.createElement('div'); t.className = isRed ? 'toast red' : 'toast'; t.innerText = msg;
     document.getElementById('toast-box').appendChild(t);
-    // যাওয়ার সময় নিচে নেমে এবং ছোট হয়ে মিলিয়ে যাওয়ার স্মুথ ইফেক্ট
+    // যাওয়ার সময় নিচে নেমে এবং ছোট হয়ে মিলিয়ে যাওয়ার স্মুথ ইফেক্ট
     setTimeout(() => { 
         t.style.opacity = '0'; 
         t.style.transform = 'translateY(20px) scale(0.9)'; 
@@ -650,12 +658,12 @@ function closeModal() {
         }));
 
         if (sDay && tDay) {
-            // ডাটা সোয়াপ
+            // ডাটা সোয়াপ
             const temp = sDay[draggedSource.field];
             sDay[draggedSource.field] = tDay[targetField];
             tDay[targetField] = temp;
 
-            // নতুন ডাটাগুলো লোকাল ভেরিয়েবলে সেভ করে রাখা হচ্ছে যেন null হয়ে না যায়
+            // নতুন ডাটাগুলো লোকাল ভেরিয়েবলে সেভ করে রাখা হচ্ছে যেন null হয়ে না যায়
             const newSourceText = sDay[draggedSource.field];
             const newTargetText = tDay[targetField];
 
@@ -680,7 +688,7 @@ function closeModal() {
             showToast("Tasks Swapped! 🔄");
         }
         
-        // সব কাজ শেষে draggedSource ক্লিয়ার করা হচ্ছে
+        // সব কাজ শেষে draggedSource ক্লিয়ার করা হচ্ছে
         draggedSource = null;
     }
 
@@ -694,6 +702,16 @@ function closeModal() {
             p.style.setProperty('--y', (Math.random()*80 - 40) + 'px');
             document.body.appendChild(p); setTimeout(() => p.remove(), 600);
         }
+    }
+
+    init(true);
+    // Service Worker Registration for Offline App
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered successfully.', reg))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        });
     }
     
     // স্ক্রল মোড হ্যান্ডেল করার ফাংশন
@@ -715,30 +733,19 @@ function toggleScroll() {
     localStorage.setItem('hsc26_scroll_mode', isScrollActive);
 }
 
-// পেজ লোড হওয়ার সময় আগের সেটিংস চেক করা
+// পেজ লোড হওয়ার সময় আগের সেটিংস চেক করা
 window.addEventListener('DOMContentLoaded', () => {
+    // লোড হওয়ার সময়ও একবার ওরিয়েন্টেশন আনলক করার চেষ্টা
+    if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock().catch(() => {});
+    }
 
-// স্ক্রিন ওরিয়েন্টেশন আনলক করার চেষ্টা (যদি ব্রাউজার সাপোর্ট করে)
-if (screen.orientation && screen.orientation.unlock) {
-    screen.orientation.unlock().catch(function(error) {
-        console.log("Orientation unlock context: ", error);
-    });
-}
     const savedScroll = localStorage.getItem('hsc26_scroll_mode') === 'true';
     if (savedScroll) {
         toggleScroll(); // যদি আগে এনাবল করা থাকে তবে তা অটোমেটিক চালু হবে
     }
 });
-
-    init(true);
-    // Service Worker Registration for Offline App
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registered successfully.', reg))
-                .catch(err => console.error('Service Worker registration failed:', err));
-        });
-    }
 </script>
 </body>
 </html>
+    
