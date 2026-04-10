@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hsc-planner-v2'; // ভার্সন পরিবর্তন করা হয়েছে
+const CACHE_NAME = 'personal-planner-v2'; // ভার্সন পরিবর্তন করা হয়েছে
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
