@@ -1,6 +1,6 @@
 {
-  "name": "Personal Plannar",
-  "short_name": "Personal Plannar",
+  "name": "Personal Planner",
+  "short_name": "Personal Planner",
   "description": "Premium Personal Study Planner for Students",
   "start_url": "./index.html",
   "display": "standalone",
