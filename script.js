@@ -716,7 +716,7 @@ function openColumnEditor() {
 
     html += '</div>';
 
-    showModal("Edit Masterplan", "", [
+    showModal("Customize Planner", "", [
         { label: "Close", class: "btn-cancel", onClick: closeModal },
         { label: "+ Add Col", class: "btn-confirm", onClick: addNewColumnUI },
         { label: "Save Columns", class: "btn-confirm", onClick: saveColumns }
