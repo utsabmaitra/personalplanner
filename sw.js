@@ -2,13 +2,14 @@ const CACHE_NAME = 'personal-planner-v2'; // ভার্সন পরিবর�
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './style.css',
+  './script.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './success.mp3',
   './click.mp3',
-  './alert.mp3',
-  './completion.mp3'
+  './alert.mp3'
 ];
 
 // Install Event - সব ফাইল ক্যাশ করা
