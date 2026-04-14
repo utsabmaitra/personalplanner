@@ -162,15 +162,18 @@ function playSfx(type) {
             const tr = document.createElement('tr');
             tr.className = rowClass; tr.id = `row-${id}`;
 
-            // ২. ডায়নামিক টাস্ক সেল (ডাবল ক্লিক + পেন্সিল আইকন)
-            let taskCellsHTML = '';
-            state.columns.forEach(col => {
-                taskCellsHTML += `
-                <td class="t-cell" draggable="true" data-id="${id}" data-field="${col.id}" ondblclick="editTask(${id}, '${col.id}')">
-                    <span class="task-text">${day[col.id] || ''}</span>
-                    ${isTaskEditMode ? `<span class="edit-icon" title="Edit Task" onclick="event.stopPropagation(); editTask(${id}, '${col.id}')">✏️</span>` : ''}
-                </td>`;
-            });
+            // ২. ডায়নামিক টাস্ক সেল (ডাবল ক্লিক হ্যান্ডলার সহ)
+let taskCellsHTML = '';
+state.columns.forEach(col => {
+    // চেক করা হচ্ছে এই নির্দিষ্ট টাস্কটি আগে থেকে কাটা (striked) কি না
+    const isStriked = (day.s && day.s[col.id]) ? 'striked' : '';
+    
+    taskCellsHTML += `
+    <td class="t-cell" draggable="true" data-id="${id}" data-field="${col.id}" ondblclick="handleTaskDblClick(${id}, '${col.id}')">
+        <span class="task-text ${isStriked}">${day[col.id] || ''}</span>
+        ${isTaskEditMode ? `<span class="edit-icon" title="Edit Task" onclick="event.stopPropagation(); editTask(${id}, '${col.id}')">✏️</span>` : ''}
+    </td>`;
+});
 
             tr.innerHTML = `
                 <td class="col-date">
@@ -836,6 +839,7 @@ function editTask(id, field) {
         { label: "Save Task", class: "btn-confirm", onClick: () => {
             let newVal = document.getElementById('edit-task-input').value;
             targetDay[field] = newVal;
+            if(targetDay.s) targetDay.s[field] = false; // এডিট করলে কাটা দাগ চলে যাবে
             save();
             init(false);
             playSfx('success');
@@ -941,4 +945,46 @@ function toggleTaskEditMode() {
     isTaskEditMode = !isTaskEditMode;
     init(false); // টেবিল রিলোড হবে, পেন্সিল আইকন দেখাবে/লুকাবে
     openColumnEditor(); // পপ-আপ রিলোড হবে যেন বাটন টেক্সট আপডেট হয়
+}
+
+// ডাবল ট্যাপ করলে এডিট হবে নাকি কাটবে তা ডিসাইড করার ফাংশন
+function handleTaskDblClick(id, field) {
+    if (isTaskEditMode) {
+        editTask(id, field); // এডিট মোড অন থাকলে আগের মতই এডিট হবে
+    } else {
+        toggleTaskStrike(id, field); // এডিট মোড অফ থাকলে টাস্ক কাটবে
+    }
+}
+
+// নির্দিষ্ট টাস্ক কাটা (Strike) এবং অটো-ডান চেক করার লজিক
+function toggleTaskStrike(id, field) {
+    if (state.done[id]) return; // দিনটি আগেই ডান হয়ে থাকলে কিছু হবে না
+
+    let targetDay;
+    state.tasks.forEach(m => m.d.forEach(d => { if(d.id === id) targetDay = d; }));
+    
+    if (!targetDay || !targetDay[field] || targetDay[field].trim() === "") return;
+
+    // টাস্ক স্ট্যাটাস অবজেক্ট না থাকলে তৈরি করা
+    if (!targetDay.s) targetDay.s = {};
+    
+    // টাস্কটি স্ট্যাটাস টগল করা (কাটা থাকলে আন-কাট হবে, না থাকলে কাটবে)
+    targetDay.s[field] = !targetDay.s[field];
+
+    save();
+    init(false);
+    playSfx('click');
+
+    // চেক করা হচ্ছে ওই দিনের সব 'ভরা' টাস্ক কাটা হয়েছে কি না
+    let allTasksStriked = state.columns.every(col => {
+        const val = targetDay[col.id] || "";
+        if (val.trim() === "") return true; // খালি সেল থাকলে সমস্যা নেই
+        return targetDay.s && targetDay.s[col.id]; // লেখা থাকলে সেটা কাটা কি না
+    });
+
+    // যদি সব টাস্ক কাটা হয়ে যায়, তবে অটোমেটিক পুরো দিনটি Done মার্ক হবে
+    if (allTasksStriked) {
+        const checkbox = document.querySelector(`#row-${id} input[type="checkbox"]`);
+        confirmMark(id, checkbox);
+    }
 }
