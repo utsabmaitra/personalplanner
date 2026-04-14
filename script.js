@@ -25,36 +25,38 @@ window.isFirstLoadFlag = true;
         }
     ];
     
-    // ১. সাউন্ডগুলো গ্লোবাল ভেরিয়েবল হিসেবে মেমরিতে লোড করা এবং Preload অন করা
-const bgSuccess = new Audio('success.mp3');
-bgSuccess.preload = 'auto'; // ব্রাউজারকে বাধ্য করবে মেমরিতে রাখতে
-
-const bgClick = new Audio('click.mp3');
-bgClick.preload = 'auto';
-
-const bgAlert = new Audio('alert.mp3');
-bgAlert.preload = 'auto';
-
-// ২. সাউন্ড ইফেক্টস কনফিগারেশন (আপনার পুরনো লজিক ঠিক রাখার জন্য)
-const sounds = {
-    success: bgSuccess, 
-    click: bgClick,   
-    alert: bgAlert    
+    
+}// ১. সাউন্ড অবজেক্ট তৈরি
+let sounds = {
+    success: null,
+    click: null,
+    alert: null
 };
 
-// সাউন্ড প্লে করার হেল্পার ফাংশন
+// ২. অডিও ফাইলকে Blob হিসেবে লোড করার ফাংশন
+async function loadSound(name, file) {
+    try {
+        const response = await fetch(file);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        sounds[name] = new Audio(url);
+        sounds[name].preload = 'auto';
+    } catch (e) {
+        console.error("Sound loading failed:", name, e);
+    }
+}
+
+// ফাইলগুলো লোড করা শুরু করুন
+loadSound('success', 'success.mp3');
+loadSound('click', 'click.mp3');
+loadSound('alert', 'alert.mp3');
+
+// ৩. প্লে করার ফাংশন (আগের মতোই থাকবে)
 function playSfx(type) {
-    if (sounds[type]) {
-        // সাউন্ড ফাইলটি লোড হয়েছে কি না তা নিশ্চিত করা
-        const sound = sounds[type];
+    const sound = sounds[type];
+    if (sound) {
         sound.currentTime = 0;
-        
-        const playPromise = sound.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Autoplay prevented or file missing:", error);
-            });
-        }
+        sound.play().catch(err => console.log("Playback error:", err));
     }
 }
 
