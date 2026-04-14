@@ -26,7 +26,7 @@ window.isFirstLoadFlag = true;
     ];
     
     
-}// ১. সাউন্ড অবজেক্ট তৈরি
+// ১. সাউন্ড অবজেক্ট তৈরি
 let sounds = {
     success: null,
     click: null,
