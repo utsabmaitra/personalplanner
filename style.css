@@ -256,6 +256,13 @@ tr.done .edit-icon { display: none !important; opacity: 0 !important; visibility
     letter-spacing: 0.5px;
 }
 
+/* নির্দিষ্ট টাস্ক কাটা বা স্ট্রাইক করার স্টাইল */
+.task-text.striked {
+    text-decoration: line-through;
+    opacity: 0.5;
+    transition: 0.3s;
+}
+
 .contact-links {
     display: flex;
     justify-content: center;
