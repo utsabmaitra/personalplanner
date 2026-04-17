@@ -984,9 +984,9 @@ function toggleTaskStrike(id, field) {
         return targetDay.s && targetDay.s[col.id]; // লেখা থাকলে সেটা কাটা কি না
     });
 
-    // যদি সব টাস্ক কাটা হয়ে যায়, তবে অটোমেটিক পুরো দিনটি Done মার্ক হবে
-    if (allTasksStriked) {
-        const checkbox = document.querySelector(`#row-${id} input[type="checkbox"]`);
-        confirmMark(id, checkbox);
-    }
+    // যদি সব টাস্ক কাটা হয়ে যায়, তবে অটোমেটিক পুরো দিনটি Done মার্ক করার পপ-আপ আসবে
+if (allTasksStriked) {
+    const checkbox = document.querySelector(`#row-${id} input[type="checkbox"]`);
+    handleTick(id, checkbox); // এখন পপ-আপ শো করবে
+}
 }
