@@ -256,11 +256,22 @@ tr.done .edit-icon { display: none !important; opacity: 0 !important; visibility
     letter-spacing: 0.5px;
 }
 
-/* নির্দিষ্ট টাস্ক কাটা বা স্ট্রাইক করার স্টাইল */
+/* টাস্ক টেক্সটের সাধারণ অবস্থা */
+.task-text {
+    display: inline-block;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    opacity: 1;
+}
+
+/* স্মুথ স্ট্রাইক-থ্রু ইফেক্ট */
 .task-text.striked {
     text-decoration: line-through;
-    opacity: 0.5;
-    transition: 0.3s;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent); /* নীলচে কাটা দাগ */
+    opacity: 0.4;
+    transform: scale(0.96); /* সামান্য ছোট হবে */
+    filter: blur(0.2px);
 }
 
 .contact-links {
