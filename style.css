@@ -292,38 +292,3 @@ tr.done .edit-icon { display: none !important; opacity: 0 !important; visibility
     background: var(--border);
     border-radius: 50%;
 }
-/* প্রোফাইল সেকশন কন্টেইনার */
-.profile-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-/* গোল প্রোফাইল পিকচার */
-.footer-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: 2px solid var(--accent); /* তোমার থিমের নীল বর্ডার */
-    box-shadow: var(--neon-shadow); /* গ্লো ইফেক্ট */
-    object-fit: cover;
-    transition: 0.3s ease-in-out;
-}
-
-/* হোভার করলে হালকা জুম হবে */
-.footer-avatar:hover {
-    transform: scale(1.1);
-    border-color: var(--success);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-}
-
-/* প্রোফাইল নাম */
-.profile-name {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--accent);
-    margin-top: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
