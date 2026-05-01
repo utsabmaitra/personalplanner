@@ -747,16 +747,24 @@ function saveColumns() {
     let newCols = [];
     
     inputs.forEach((inp, idx) => {
-        if(inp.value.trim() !== "") {
-            // যদি আগের কলাম হয় তবে আগের ID (t1, t2) রাখবে, না হলে নতুন ID (t4, t5) বানাবে
-            let id = (state.columns[idx] && state.columns[idx].id) ? state.columns[idx].id : `t${idx + 1}`;
-            newCols.push({ id: id, name: inp.value.trim() });
+        const value = inp.value.trim();
+        if(value !== "") {
+            let id;
+            // যদি এই পজিশনে আগে থেকেই কোনো কলাম থেকে থাকে, তবে তার ID অপরিবর্তিত থাকবে
+            if (state.columns[idx] && state.columns[idx].id) {
+                id = state.columns[idx].id;
+            } else {
+                // নতুন কলামের জন্য ইউনিক টাইমস্ট্যাম্প ভিত্তিক ID তৈরি হবে
+                // এতে পুরনো 't1', 't2' আইডি-র সাথে আর সংঘর্ষ হবে না
+                id = `col_${Date.now()}_${idx}`;
+            }
+            newCols.push({ id: id, name: value });
         }
     });
 
     state.columns = newCols;
-    save(); // লোকাল স্টোরেজে সেভ
-    init(false); // টেবিল নতুন করে রেন্ডার করা
+    save(); 
+    init(false); 
     closeModal();
     playSfx('success');
     showToast("Columns Updated Successfully! 🛠️");
