@@ -562,7 +562,7 @@ function closeModal() {
         draggedSource = { id, field };
     }
 
-            function handleDrop(e, targetId, targetCell) {
+    function handleDrop(e, targetId, targetCell) {
     e.preventDefault();
     targetCell.classList.remove('drag-over');
     if (!draggedSource) return;
