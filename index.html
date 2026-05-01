@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Planner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+
+    <div id="modal-overlay">
+        <div class="modal">
+            <h4 id="modal-title" style="margin:0; color:var(--accent);">Confirm Action</h4>
+            <p id="modal-text" style="color:var(--sub); font-size:13px; margin-top:8px;"></p>
+            <div class="modal-btns" id="modal-actions"></div>
+        </div>
+    </div>
+
+    <div id="toast-box"></div>
+
+    <div class="header">
+        <h3 style="margin:0; color:var(--accent); font-size: 16px;">🚀 PERSONAL PLANNER</h3>
+        <div class="countdown-box timer-locked" id="global-timer-box">
+            <div class="time-unit"><span class="time-val" id="d-val">00</span><span class="time-label">Days</span></div>
+            <span class="sep">:</span>
+            <div class="time-unit"><span class="time-val" id="h-val">00</span><span class="time-label">Hours</span></div>
+            <span class="sep">:</span>
+            <div class="time-unit"><span class="time-val" id="m-val">00</span><span class="time-label">Mins</span></div>
+            <span class="sep">:</span>
+            <div class="time-unit"><span class="time-val" id="s-val">00</span><span class="time-label">Secs</span></div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar"><div id="fill"></div></div>
+            <p id="stat" style="font-size: 9px; color: var(--sub); margin: 0; font-weight: 700;">0% Completed</p>
+        </div>
+        <div class="btn-group">
+    <button class="start-btn" id="start-btn" onclick="startTimer()">START SESSION</button>
+    <button class="start-btn" id="scroll-btn" onclick="toggleScroll()">🔓 ENABLE SCROLL</button>
+    <button class="start-btn" id="col-btn" onclick="openColumnEditor()" style="flex: 0.5;">⚙️ EDIT</button>
+</div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr id="table-header-row">
+                    </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="profile-section">
+    <img src="profile.jpg" alt="Utsab" class="footer-avatar">
+    <div class="profile-name">Dev. Utsab</div>
+    </div>
+        <p>© Personal Planner • Built for Students</p>
+        <div class="contact-links">
+            <a href="mailto:utsab2366@gmail.com" title="Report a Bug">💡 Feedback</a>            
+            
+            <span class="dot"></span>          
+            
+            <a href="https://t.me/+BXp3ALp01MwyYWJl" target="_blank" title="Suggest Feature">🎧 Contact Support</a>
+            
+            <span class="dot"></span>
+            <a href="https://t.me/c/3963864942/4" target="_blank" title="Rate Our App">⭐ Rate Us</a>
+        </div>
+    </div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
