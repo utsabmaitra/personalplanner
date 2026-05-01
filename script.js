@@ -610,7 +610,7 @@ function closeModal() {
         }
 
         playSfx('click');
-        showToast("Tasks Swapped with Status! 🔄");
+        showToast("Tasks Swapped! 🔄");
     }
     draggedSource = null;
 }
