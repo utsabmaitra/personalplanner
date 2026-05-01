@@ -219,7 +219,16 @@ state.columns.forEach(col => {
     }
     runTimer();
 }
-
+// অ্যাপ লোড হওয়ার পর স্প্ল্যাশ স্ক্রিন সরিয়ে ফেলার লজিক
+window.addEventListener('load', () => {
+    const splash = document.getElementById('app-splash');
+    setTimeout(() => {
+        splash.style.opacity = '0';
+        splash.style.visibility = 'hidden';
+        // ৫ সেকেন্ড পর ডম থেকে সরিয়ে ফেলা যাতে পারফরম্যান্স ভালো থাকে
+        setTimeout(() => splash.remove(), 500);
+    }, 1500); // ১.৫ সেকেন্ড শো করবে, আপনি চাইলে সময় কমাতে পারেন
+});
     function runTimer() {
         if (timerRef) clearInterval(timerRef);
         timerRef = setInterval(updateStats, 1000);
