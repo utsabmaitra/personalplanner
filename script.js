@@ -553,67 +553,67 @@ function closeModal() {
         draggedSource = { id, field };
     }
 
-        function handleDrop(e, targetId, targetCell) {
-        e.preventDefault();
-        targetCell.classList.remove('drag-over');
-        if (!draggedSource) return;
-        
-        const targetField = targetCell.getAttribute('data-field');
-        
-        if (draggedSource.id === targetId && draggedSource.field === targetField) {
-            draggedSource = null;
-            return; 
-        }
-
-        if (state.done[targetId]) { 
-            showToast("Cannot move tasks to a completed day! 🚫", true); 
-            playSfx('alert'); 
-            return; 
-        }
-        
-        let sDay, tDay;
-        state.tasks.forEach(m => m.d.forEach(d => { 
-            if (d.id === draggedSource.id) sDay = d; 
-            if (d.id === targetId) tDay = d; 
-        }));
-
-        if (sDay && tDay) {
-            // ডাটা সোয়াপ: যদি undefined থাকে, তবে সেটিকে খালি স্ট্রিং ("") বানিয়ে দিবে
-            const temp = sDay[draggedSource.field] || "";
-            sDay[draggedSource.field] = tDay[targetField] || "";
-            tDay[targetField] = temp;
-
-            // ভ্যালুগুলো আপডেট করা
-            const newSourceText = sDay[draggedSource.field];
-            const newTargetText = tDay[targetField];
-
-            // DOM আপডেট
-            const sourceCell = document.querySelector(`td[data-id="${draggedSource.id}"][data-field="${draggedSource.field}"]`);
-            
-            if (sourceCell) {
-                sourceCell.style.opacity = '0';
-                targetCell.style.opacity = '0';
-
-                // অ্যানিমেশন টাইমার
-                setTimeout(() => {
-                    // পুরো td রিপ্লেস না করে শুধু .task-text স্প্যানের লেখা চেঞ্জ করা হচ্ছে 
-                    // এতে করে পেন্সিল আইকনটা (✏️) আর মুছে যাবে লাল!
-                    sourceCell.querySelector('.task-text').innerHTML = newSourceText;
-                    targetCell.querySelector('.task-text').innerHTML = newTargetText;
-                    
-                    sourceCell.style.opacity = '1';
-                    targetCell.style.opacity = '1';
-                }, 150); 
-            }
-
-            save(); 
-            playSfx('click');
-            showToast("Tasks Swapped! 🔄");
-        }
-        
-        // সব কাজ শেষে draggedSource ক্লিয়ার করা হচ্ছে
+            function handleDrop(e, targetId, targetCell) {
+    e.preventDefault();
+    targetCell.classList.remove('drag-over');
+    if (!draggedSource) return;
+    
+    const targetField = targetCell.getAttribute('data-field');
+    
+    if (draggedSource.id === targetId && draggedSource.field === targetField) {
         draggedSource = null;
-    }    
+        return; 
+    }
+
+    if (state.done[targetId]) { 
+        showToast("Cannot move tasks to a completed day! 🚫", true); 
+        playSfx('alert'); 
+        return; 
+    }
+    
+    let sDay, tDay;
+    state.tasks.forEach(m => m.d.forEach(d => { 
+        if (d.id === draggedSource.id) sDay = d; 
+        if (d.id === targetId) tDay = d; 
+    }));
+
+    if (sDay && tDay) {
+        // ১. টাস্কের টেক্সট সোয়াপ করা
+        const tempText = sDay[draggedSource.field] || "";
+        sDay[draggedSource.field] = tDay[targetField] || "";
+        tDay[targetField] = tempText;
+
+        // ২. কাটা দাগের (Strike) স্ট্যাটাস সোয়াপ করা (যাতে ঘর না কেটে টাস্ক কাটে)
+        if (!sDay.s) sDay.s = {};
+        if (!tDay.s) tDay.s = {};
+        
+        const tempStrike = sDay.s[draggedSource.field] || false;
+        sDay.s[draggedSource.field] = tDay.s[targetField] || false;
+        tDay.s[targetField] = tempStrike;
+
+        // UI আপডেট (Smooth opacity transition)
+        const sourceCell = document.querySelector(`td[data-id="${draggedSource.id}"][data-field="${draggedSource.field}"]`);
+        
+        if (sourceCell) {
+            sourceCell.style.opacity = '0';
+            targetCell.style.opacity = '0';
+
+            setTimeout(() => {
+                save(); 
+                init(false); // পুরো টেবিল রি-রেন্ডার হবে সঠিক ডাটা সহ
+                
+                const sCellNew = document.querySelector(`td[data-id="${draggedSource.id}"][data-field="${draggedSource.field}"]`);
+                const tCellNew = document.querySelector(`td[data-id="${targetId}"][data-field="${targetField}"]`);
+                if(sCellNew) sCellNew.style.opacity = '1';
+                if(tCellNew) tCellNew.style.opacity = '1';
+            }, 150); 
+        }
+
+        playSfx('click');
+        showToast("Tasks Swapped with Status! 🔄");
+    }
+    draggedSource = null;
+}
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
