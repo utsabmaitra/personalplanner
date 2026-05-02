@@ -292,40 +292,52 @@ tr.done .edit-icon { display: none !important; opacity: 0 !important; visibility
     background: var(--border);
     border-radius: 50%;
 }
-/* প্রোফাইল সেকশন কন্টেইনার */
-.profile-section {
+/* --- New Premium Developer Signature --- */
+.dev-signature {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    gap: 4px;
 }
 
-/* গোল প্রোফাইল পিকচার */
-.footer-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    border: 2px solid var(--accent); /* তোমার থিমের নীল বর্ডার */
-    box-shadow: var(--neon-shadow); /* গ্লো ইফেক্ট */
-    object-fit: cover;
-    transition: 0.3s ease-in-out;
-}
-
-/* হোভার করলে হালকা জুম হবে */
-.footer-avatar:hover {
-    transform: scale(1.1);
-    border-color: var(--success);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-}
-
-/* প্রোফাইল নাম */
-.profile-name {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--accent);
-    margin-top: 5px;
+.dev-label {
+    font-size: 8px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    color: var(--sub);
+    letter-spacing: 3px;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.dev-name {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    /* Gradient text effect */
+    background: linear-gradient(135deg, var(--accent) 0%, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    display: inline-block;
+}
+
+/* নামের নিচে একটি প্রিমিয়াম আন্ডারলাইন গ্লো */
+.dev-name::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 15%;
+    width: 70%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow: var(--neon-shadow);
+}
+
+.dev-signature:hover .dev-name {
+    filter: drop-shadow(0 0 8px var(--accent));
+    transition: 0.4s ease;
 }
 /* --- Splash Screen CSS --- */
 #app-splash {
