@@ -105,10 +105,10 @@
             transition: opacity 0.15s ease-in-out, transform 0.2s ease, background 0.2s ease; 
 
         /* অপেরা ব্রাউজারের জন্য এই ৩ লাইন মাস্ট যোগ করতে হবে */
-    touch-action: none !important; 
     user-select: none;
     -webkit-user-select: none;
-        }
+    touch-action: pan-x pan-y; /* এটি স্ক্রলিং অ্যালাউ করবে */
+    }
         .t-cell:active, .col-bio:active { 
             cursor: grabbing; 
             opacity: 0.6; 
