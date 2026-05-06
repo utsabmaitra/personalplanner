@@ -103,6 +103,11 @@
             cursor: grab; 
             padding: 10px 8px; 
             transition: opacity 0.15s ease-in-out, transform 0.2s ease, background 0.2s ease; 
+
+        /* অপেরা ব্রাউজারের জন্য এই ৩ লাইন মাস্ট যোগ করতে হবে */
+    touch-action: none !important; 
+    user-select: none;
+    -webkit-user-select: none;
         }
         .t-cell:active, .col-bio:active { 
             cursor: grabbing; 
