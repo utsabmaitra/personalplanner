@@ -193,7 +193,8 @@ state.columns.forEach(col => {
                 </td>
             `;            
 
-            tr.querySelectorAll('[draggable="true"]').forEach(cell => {
+                        tr.querySelectorAll('[draggable="true"]').forEach(cell => {
+                // ১. ডেস্কটপ এবং ক্রোমের জন্য আগের ডিফল্ট ইভেন্টগুলো
                 cell.addEventListener('dragstart', (e) => handleDragStart(e, id, cell.getAttribute('data-field')));
                 cell.addEventListener('dragover', (e) => {
                     e.preventDefault();
@@ -204,6 +205,69 @@ state.columns.forEach(col => {
                 });
                 cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
                 cell.addEventListener('drop', (e) => handleDrop(e, id, cell));
+
+                // ২. অপেরা এবং অন্যান্য ব্রাউজারের জন্য আমাদের নিজস্ব "টাচ-সোয়াপ" লজিক
+                let touchTimer = null;
+
+                cell.addEventListener('touchstart', (e) => {
+                    if(state.done[id] || isTaskEditMode) return;
+                    
+                    // ৩০০ মিলি সেকেন্ড হোল্ড করলে টাচ-ড্র্যাগ শুরু হবে
+                    touchTimer = setTimeout(() => {
+                        draggedSource = { id: id, field: cell.getAttribute('data-field') };
+                        cell.classList.add('drag-over'); 
+                        if(navigator.vibrate) navigator.vibrate(50); // সিলেক্ট হলে ছোট্ট একটা ভাইব্রেশন হবে
+                    }, 300); 
+                }, {passive: true});
+
+                cell.addEventListener('touchmove', (e) => {
+                    // যদি হোল্ড করার আগেই ইউজার স্ক্রল করে ফেলে, তবে ড্র্যাগ বাতিল
+                    if (!draggedSource) {
+                        clearTimeout(touchTimer); 
+                        return;
+                    }
+                    e.preventDefault(); // ড্র্যাগ চলাকালীন পেজ স্ক্রল হওয়া বন্ধ করবে
+                    
+                    const touch = e.touches[0];
+                    // আঙুলের ঠিক নিচে কোন এলিমেন্ট আছে সেটা বের করা
+                    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                    
+                    document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+                    
+                    if (targetEl && targetEl.closest('.t-cell')) {
+                        const hoveredCell = targetEl.closest('.t-cell');
+                        const hoverId = Number(hoveredCell.getAttribute('data-id'));
+                        // যে সেলের ওপর দিয়ে যাচ্ছে, সেটা যদি আগে থেকেই Done না হয়ে থাকে, তবে হাইলাইট করবে
+                        if (!state.done[hoverId]) {
+                            hoveredCell.classList.add('drag-over');
+                        }
+                    }
+                }, {passive: false});
+
+                cell.addEventListener('touchend', (e) => {
+                    clearTimeout(touchTimer);
+                    if (!draggedSource) return; // ড্র্যাগ শুরু না হয়ে থাকলে বাদ
+                    
+                    const touch = e.changedTouches[0];
+                    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const dropCell = targetEl ? targetEl.closest('.t-cell') : null;
+
+                    document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+                    
+                    if (dropCell) {
+                        const targetId = Number(dropCell.getAttribute('data-id'));
+                        // আপনার আগের ড্রপ ফাংশনকেই কাস্টম অবজেক্ট দিয়ে কল করা হলো
+                        handleDrop({ preventDefault: () => {} }, targetId, dropCell);
+                    } else {
+                        draggedSource = null; // বাইরে ছাড়লে ক্যানসেল
+                    }
+                });
+                
+                cell.addEventListener('touchcancel', () => {
+                    clearTimeout(touchTimer);
+                    draggedSource = null;
+                    document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+                });
             });
 
             tbody.appendChild(tr);
