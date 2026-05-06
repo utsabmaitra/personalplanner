@@ -193,8 +193,8 @@ state.columns.forEach(col => {
                 </td>
             `;            
 
-                        tr.querySelectorAll('[draggable="true"]').forEach(cell => {
-                // ১. ডেস্কটপ এবং ক্রোমের জন্য আগের ডিফল্ট ইভেন্টগুলো
+                                    tr.querySelectorAll('[draggable="true"]').forEach(cell => {
+                // ১. ডেস্কটপ ইউজারদের জন্য (Chrome/Edge)
                 cell.addEventListener('dragstart', (e) => handleDragStart(e, id, cell.getAttribute('data-field')));
                 cell.addEventListener('dragover', (e) => {
                     e.preventDefault();
@@ -206,30 +206,31 @@ state.columns.forEach(col => {
                 cell.addEventListener('dragleave', () => cell.classList.remove('drag-over'));
                 cell.addEventListener('drop', (e) => handleDrop(e, id, cell));
 
-                // ২. অপেরা এবং অন্যান্য ব্রাউজারের জন্য আমাদের নিজস্ব "টাচ-সোয়াপ" লজিক
+                // ২. অপেরা এবং টাচ ডিভাইসের জন্য (স্ক্রল ঠিক রেখে ড্র্যাগ করার লজিক)
                 let touchTimer = null;
 
                 cell.addEventListener('touchstart', (e) => {
                     if(state.done[id] || isTaskEditMode) return;
                     
-                    // ৩০০ মিলি সেকেন্ড হোল্ড করলে টাচ-ড্র্যাগ শুরু হবে
+                    // ৩০০ms ধরে রাখলে ড্র্যাগ শুরু হবে
                     touchTimer = setTimeout(() => {
                         draggedSource = { id: id, field: cell.getAttribute('data-field') };
                         cell.classList.add('drag-over'); 
-                        if(navigator.vibrate) navigator.vibrate(50); // সিলেক্ট হলে ছোট্ট একটা ভাইব্রেশন হবে
+                        if(navigator.vibrate) navigator.vibrate(50);
                     }, 300); 
                 }, {passive: true});
 
                 cell.addEventListener('touchmove', (e) => {
-                    // যদি হোল্ড করার আগেই ইউজার স্ক্রল করে ফেলে, তবে ড্র্যাগ বাতিল
+                    // যদি ড্র্যাগ শুরু না হয় (অর্থাৎ ৩০০০ms পার হয়নি), তবে টাইমার ক্যানসেল করে স্ক্রল করতে দাও
                     if (!draggedSource) {
                         clearTimeout(touchTimer); 
-                        return;
+                        return; 
                     }
-                    e.preventDefault(); // ড্র্যাগ চলাকালীন পেজ স্ক্রল হওয়া বন্ধ করবে
+                    
+                    // ড্র্যাগ শুরু হয়ে গেলে স্ক্রল বন্ধ করো
+                    if (e.cancelable) e.preventDefault(); 
                     
                     const touch = e.touches[0];
-                    // আঙুলের ঠিক নিচে কোন এলিমেন্ট আছে সেটা বের করা
                     const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
                     
                     document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
@@ -237,7 +238,6 @@ state.columns.forEach(col => {
                     if (targetEl && targetEl.closest('.t-cell')) {
                         const hoveredCell = targetEl.closest('.t-cell');
                         const hoverId = Number(hoveredCell.getAttribute('data-id'));
-                        // যে সেলের ওপর দিয়ে যাচ্ছে, সেটা যদি আগে থেকেই Done না হয়ে থাকে, তবে হাইলাইট করবে
                         if (!state.done[hoverId]) {
                             hoveredCell.classList.add('drag-over');
                         }
@@ -246,7 +246,7 @@ state.columns.forEach(col => {
 
                 cell.addEventListener('touchend', (e) => {
                     clearTimeout(touchTimer);
-                    if (!draggedSource) return; // ড্র্যাগ শুরু না হয়ে থাকলে বাদ
+                    if (!draggedSource) return; 
                     
                     const touch = e.changedTouches[0];
                     const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -256,11 +256,9 @@ state.columns.forEach(col => {
                     
                     if (dropCell) {
                         const targetId = Number(dropCell.getAttribute('data-id'));
-                        // আপনার আগের ড্রপ ফাংশনকেই কাস্টম অবজেক্ট দিয়ে কল করা হলো
                         handleDrop({ preventDefault: () => {} }, targetId, dropCell);
-                    } else {
-                        draggedSource = null; // বাইরে ছাড়লে ক্যানসেল
                     }
+                    draggedSource = null; 
                 });
                 
                 cell.addEventListener('touchcancel', () => {
