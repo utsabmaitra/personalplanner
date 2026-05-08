@@ -447,6 +447,7 @@ function updateStats() {
     function handleTick(id, box) {
     if (state.done[id]) { 
         box.checked = true;
+		playSfx('alert');
         showToast("This day is already completed! 🎯", true); 
         return; 
     }
@@ -688,7 +689,7 @@ function closeModal() {
     }
 
     if (state.done[targetId]) { 
-        showToast("Cannot move tasks to a completed day! 🚫", true); 
+        showToast("Cannot move tasks to a completed day! 🔄", true); 
         playSfx('alert'); 
         return; 
     }
@@ -705,7 +706,7 @@ function closeModal() {
 
         // যদি দুই ঘরই খালি হয়, তবে সোয়াপ হবে না
         if (sourceText === "" && targetText === "") {
-            showToast("Both cells are empty! Cannot swap. 🚫", true);
+            showToast("Both cells are empty! Cannot swap. 🔄", true);
             playSfx('alert');
             draggedSource = null;
             return;
@@ -1018,7 +1019,7 @@ function editTask(id, field) {
     // --- ফিক্স: সাইলেন্ট রিটার্নের বদলে টোস্ট এবং সাউন্ড যোগ করা হলো ---
     if (state.done[id] || (targetDay.s && targetDay.s[field])) {
         playSfx('alert');
-        showToast("Completed tasks cannot be edited! 🚫", true);
+        showToast("Completed tasks cannot be edited! 📝", true);
         return;
     }
     // -------------------------------------------------------------
