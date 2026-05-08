@@ -324,12 +324,14 @@ function updateStats() {
     document.getElementById('stat').innerText = `${per}% Overall Progress (${completedTasks}/${totalTasks})`;
 
     let remainingGlobal = 0;
+    let lastDayDate; // ডেট ডিফারেন্স ক্যালকুলেট করার জন্য বাইরে ডিক্লেয়ার করা হলো
 
     // --- গ্লোবাল টাইমার ক্যালকুলেশন ---
     if (state.activeId) {
         let lastMonthInfo = state.tasks[state.tasks.length - 1];
         let lastDayInfo = lastMonthInfo.d[lastMonthInfo.d.length - 1];
-        const lastDayDate = getRealDate(lastMonthInfo.m, lastDayInfo.date);
+        lastDayDate = getRealDate(lastMonthInfo.m, lastDayInfo.date);
+        
         const globalEndTime = new Date(lastDayDate);
         globalEndTime.setHours(23, 59, 59, 999);
         remainingGlobal = Math.floor((globalEndTime.getTime() - Date.now()) / 1000);
@@ -349,7 +351,6 @@ function updateStats() {
             btn.style.border = "2px solid var(--success)";
             btn.style.color = "var(--success)";
 
-            // ফিক্স: রিফ্রেশ করলে (First Load) টোস্ট দেখাবে না, শুধু ফ্ল্যাগ সেট করে রাখবে
             if (window.isFirstLoadFlag) {
                 window.hasCelebrated = true; 
             } else if (!window.hasCelebrated) {
@@ -365,11 +366,23 @@ function updateStats() {
             btn.style.border = "2px solid var(--accent)";
             btn.style.color = "var(--accent)";
 
-            // ফিক্স: রিফ্রেশ করলে (First Load) পজড মেসেজ দেখাবে না
             if (window.isFirstLoadFlag) {
                 window.hasPausedNotified = true;
             } else if (!window.hasPausedNotified) {
-                showToast("Time's up! Add new row(s) to catch up and continue. ⏳", true);
+                
+                // --- ডাইনামিক ডেট ডিফারেন্স ক্যালকুলেশন ---
+                const nowMidnight = new Date();
+                nowMidnight.setHours(0, 0, 0, 0);
+                const lastMidnight = new Date(lastDayDate);
+                lastMidnight.setHours(0, 0, 0, 0);
+                
+                // কয়দিন গ্যাপ সেটা বের করা হচ্ছে
+                const diffDays = Math.round((nowMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
+                
+                // ১ দিন হলে a new row, নাহলে X new rows
+                let rowText = diffDays > 1 ? `${diffDays} new rows` : `a new row`;
+                
+                showToast(`Time's up! Add ${rowText} to catch up and continue. ⏳`, true);
                 window.hasPausedNotified = true;
             }
             window.hasCelebrated = false; 
@@ -390,7 +403,6 @@ function updateStats() {
     } else {
         updateButtonUI(false);
         updateCountdownUI(0);
-        // সেশন স্টার্ট না থাকলে ফ্ল্যাগগুলো রিসেট রাখা ভালো
         window.hasCelebrated = (per === 100); 
         window.hasPausedNotified = false;
     }
@@ -400,7 +412,6 @@ function updateStats() {
     state.tasks.forEach(month => {
         month.d.forEach(day => {
             let diff = 0;
-            // সেশন একটিভ থাকলেই কেবল রো টাইমার ক্যালকুলেট হবে
             if (state.activeId) {
                 const taskDate = getRealDate(month.m, day.date);
                 const endOfDay = new Date(taskDate);
@@ -413,7 +424,6 @@ function updateStats() {
         });
     });
 
-    // সব লজিক চেক করার পর ফার্স্ট লোড ফ্ল্যাগ ফলস করা হলো
     window.isFirstLoadFlag = false;
 }
 
