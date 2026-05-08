@@ -1,4 +1,4 @@
-const CACHE_NAME = 'personal-planner-v50'; // ভার্সন বাড়িয়ে দিন
+const CACHE_NAME = 'personal-planner-v51'; // ভার্সন বাড়িয়ে দিন
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
