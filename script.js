@@ -349,10 +349,8 @@ function updateStats() {
             btn.style.border = "2px solid var(--success)";
             btn.style.color = "var(--success)";
 
-            if (window.isFirstLoadFlag) {
-                showToast("Add a new row to start a new session! ➕");
-                window.hasCelebrated = true;
-            } else if (!window.hasCelebrated) {
+            // আপডেট: ফার্স্ট লোড না হলে এবং আগে সেলিব্রেট না করে থাকলে টোস্ট দেখাবে
+            if (!window.isFirstLoadFlag && !window.hasCelebrated) {
                 showToast("Mission Accomplished! 🏆 All tasks done.");
                 playSfx('success');
                 window.hasCelebrated = true;
@@ -365,11 +363,13 @@ function updateStats() {
             btn.style.border = "2px solid var(--accent)";
             btn.style.color = "var(--accent)";
 
-            if (window.isFirstLoadFlag || !window.hasPausedNotified) {
-                showToast("Time's up! Please add a new row to continue. ⏳", true);
+            // আপডেট: লজিক্যাল টোস্ট মেসেজ
+            if (!window.isFirstLoadFlag && !window.hasPausedNotified) {
+                showToast("Time's up! Add new row(s) to catch up and continue. ⏳", true);
                 window.hasPausedNotified = true;
             }
-            window.hasCelebrated = true; 
+            window.hasCelebrated = false; 
+            
         } else {
             btn.innerText = "● PROGRESS RUNNING";
             btn.style.background = "";
@@ -382,15 +382,14 @@ function updateStats() {
 
         updateCountdownUI(remainingGlobal);
         
-        // অটো-রো জেনারেট শুধু তখনই কাজ করবে যখন সেশন রানিং (কমপ্লিট বা পজড অবস্থায় নয়)
-        // ফলে ডিলিট করলেও হুট করে অটো-রো অ্যাড হয়ে যাবে না
+        // অটো-রো জেনারেট শুধু তখনই কাজ করবে যখন সেশন রানিং
         if (remainingGlobal > 0 && per < 100) {
             autoGenerateNextDay();
         }
         
     } else {
         updateButtonUI(false);
-        updateCountdownUI(0); // সেশন স্টার্ট না হলে টাইমার 0 থাকবে
+        updateCountdownUI(0);
         window.hasCelebrated = false;
         window.hasPausedNotified = false;
     }
