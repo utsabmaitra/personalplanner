@@ -325,7 +325,7 @@ function updateStats() {
 
     let remainingGlobal = 0;
 
-    // --- টাইমার ক্যালকুলেশন (শুধুমাত্র সেশন স্টার্ট থাকলে) ---
+    // --- গ্লোবাল টাইমার ক্যালকুলেশন ---
     if (state.activeId) {
         let lastMonthInfo = state.tasks[state.tasks.length - 1];
         let lastDayInfo = lastMonthInfo.d[lastMonthInfo.d.length - 1];
@@ -349,8 +349,10 @@ function updateStats() {
             btn.style.border = "2px solid var(--success)";
             btn.style.color = "var(--success)";
 
-            // আপডেট: ফার্স্ট লোড না হলে এবং আগে সেলিব্রেট না করে থাকলে টোস্ট দেখাবে
-            if (!window.isFirstLoadFlag && !window.hasCelebrated) {
+            // ফিক্স: রিফ্রেশ করলে (First Load) টোস্ট দেখাবে না, শুধু ফ্ল্যাগ সেট করে রাখবে
+            if (window.isFirstLoadFlag) {
+                window.hasCelebrated = true; 
+            } else if (!window.hasCelebrated) {
                 showToast("Mission Accomplished! 🏆 All tasks done.");
                 playSfx('success');
                 window.hasCelebrated = true;
@@ -363,8 +365,10 @@ function updateStats() {
             btn.style.border = "2px solid var(--accent)";
             btn.style.color = "var(--accent)";
 
-            // আপডেট: লজিক্যাল টোস্ট মেসেজ
-            if (!window.isFirstLoadFlag && !window.hasPausedNotified) {
+            // ফিক্স: রিফ্রেশ করলে (First Load) পজড মেসেজ দেখাবে না
+            if (window.isFirstLoadFlag) {
+                window.hasPausedNotified = true;
+            } else if (!window.hasPausedNotified) {
                 showToast("Time's up! Add new row(s) to catch up and continue. ⏳", true);
                 window.hasPausedNotified = true;
             }
@@ -372,17 +376,13 @@ function updateStats() {
             
         } else {
             btn.innerText = "● PROGRESS RUNNING";
-            btn.style.background = "";
-            btn.style.border = "";
-            btn.style.color = "";
-            
+            btn.style.background = ""; btn.style.border = ""; btn.style.color = "";
             window.hasCelebrated = false;
             window.hasPausedNotified = false;
         }
 
         updateCountdownUI(remainingGlobal);
         
-        // অটো-রো জেনারেট শুধু তখনই কাজ করবে যখন সেশন রানিং
         if (remainingGlobal > 0 && per < 100) {
             autoGenerateNextDay();
         }
@@ -390,25 +390,31 @@ function updateStats() {
     } else {
         updateButtonUI(false);
         updateCountdownUI(0);
-        window.hasCelebrated = false;
+        // সেশন স্টার্ট না থাকলে ফ্ল্যাগগুলো রিসেট রাখা ভালো
+        window.hasCelebrated = (per === 100); 
         window.hasPausedNotified = false;
     }
     
-    window.isFirstLoadFlag = false;
-
-    // --- রো টাইমার আপডেট ---
+    // --- রো টাইমার আপডেট (সেশন চেক সহ) ---
     const now = new Date();
     state.tasks.forEach(month => {
         month.d.forEach(day => {
-            const taskDate = getRealDate(month.m, day.date);
-            const endOfDay = new Date(taskDate);
-            endOfDay.setHours(23, 59, 59, 999);
-            let diff = Math.floor((endOfDay.getTime() - now.getTime()) / 1000);
-            if (diff < 0) diff = 0;
-            if (diff > 86400) diff = 86400;
+            let diff = 0;
+            // সেশন একটিভ থাকলেই কেবল রো টাইমার ক্যালকুলেট হবে
+            if (state.activeId) {
+                const taskDate = getRealDate(month.m, day.date);
+                const endOfDay = new Date(taskDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                diff = Math.floor((endOfDay.getTime() - now.getTime()) / 1000);
+                if (diff < 0) diff = 0;
+                if (diff > 86400) diff = 86400;
+            }
             updateRowTimerUI(day.id, diff);
         });
     });
+
+    // সব লজিক চেক করার পর ফার্স্ট লোড ফ্ল্যাগ ফলস করা হলো
+    window.isFirstLoadFlag = false;
 }
 
     function updateRowTimerUI(id, s) {
