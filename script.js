@@ -360,26 +360,20 @@ function updateStats() {
             }
             window.hasPausedNotified = false;
             
-        } else if (remainingGlobal <= 0) {
+                } else if (remainingGlobal <= 0) {
             btn.innerText = "⏸️ PROGRESS PAUSED";
             btn.style.background = "transparent";
             btn.style.border = "2px solid var(--accent)";
             btn.style.color = "var(--accent)";
 
-            if (window.isFirstLoadFlag) {
-                window.hasPausedNotified = true;
-            } else if (!window.hasPausedNotified) {
-                
-                // --- ডাইনামিক ডেট ডিফারেন্স ক্যালকুলেশন ---
+            // আপডেট: রিফ্রেশ করলেও অন্তত একবার রিমাইন্ডার টোস্টটি দেখাবে
+            if (!window.hasPausedNotified) {
                 const nowMidnight = new Date();
                 nowMidnight.setHours(0, 0, 0, 0);
                 const lastMidnight = new Date(lastDayDate);
                 lastMidnight.setHours(0, 0, 0, 0);
                 
-                // কয়দিন গ্যাপ সেটা বের করা হচ্ছে
                 const diffDays = Math.round((nowMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
-                
-                // ১ দিন হলে a new row, নাহলে X new rows
                 let rowText = diffDays > 1 ? `${diffDays} new rows` : `a new row`;
                 
                 showToast(`Time's up! Add ${rowText} to catch up and continue. ⏳`, true);
