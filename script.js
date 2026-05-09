@@ -1184,6 +1184,7 @@ function deleteSpecificRow(id) {
 }
 
 function toggleTaskEditMode() {
+	playSfx('click');
     isTaskEditMode = !isTaskEditMode;
     const modalState = captureModalState(); // বর্তমান স্টেট সেভ করা হলো
     init(false); 
