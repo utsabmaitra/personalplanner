@@ -1192,16 +1192,25 @@ function toggleTaskEditMode() {
 
 function handleTaskDblClick(id, field) {
     if (isTaskEditMode) {
-        // ১. যদি এডিট মোড অন থাকে, তবে সরাসরি editTask-এ পাঠিয়ে দাও
-        // সেখানে থাকা "Completed tasks cannot be edited!" ওয়ার্নিংটা তখন কাজ করবে
         editTask(id, field);
     } else {
-        // ২. যদি এডিট মোড অফ থাকে, তখন এই লক চেকটা কাজ করবে
         if (state.done[id]) {
             playSfx('alert');
             showToast("Completed tasks are locked! 🔒", true);
             return;
         }
+
+        // --- নতুন যোগ করা অংশ (ফাঁকা সেল চেক করার জন্য) ---
+        let targetDay;
+        state.tasks.forEach(m => m.d.forEach(d => { if (d.id === id) targetDay = d; }));
+        
+        if (!targetDay || !targetDay[field] || targetDay[field].trim() === "") {
+            playSfx('alert'); // চাইলে সাউন্ড অফ রাখতে পারেন
+            showToast("Enable '✏️ Show Task Edit Icons' to write here!", true);
+            return;
+        }
+        // ---------------------------------------------------
+
         confirmTaskStrike(id, field);
     }
 }
