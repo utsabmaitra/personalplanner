@@ -706,7 +706,7 @@ function closeModal() {
 
         // যদি দুই ঘরই খালি হয়, তবে সোয়াপ হবে না
         if (sourceText === "" && targetText === "") {
-            showToast("Both cells are empty! Cannot swap. ⚠️", true);
+            showToast("Cells empty! Can't swap. ⚠️", true);
             playSfx('alert');
             draggedSource = null;
             return;
@@ -1019,7 +1019,7 @@ function editTask(id, field) {
     // --- ফিক্স: সাইলেন্ট রিটার্নের বদলে টোস্ট এবং সাউন্ড যোগ করা হলো ---
     if (state.done[id] || (targetDay.s && targetDay.s[field])) {
         playSfx('alert');
-        showToast("Completed tasks cannot be edited! ⚠️", true);
+        showToast("Done tasks can't be edited!⚠️", true);
         return;
     }
     // -------------------------------------------------------------
