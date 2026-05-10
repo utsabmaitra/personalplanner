@@ -1271,6 +1271,7 @@ function toggleTaskStrike(id, field) {
 
     save();
     init(false);
+	playSfx('success');
     showToast("Task completed! ✅"); // টাস্ক কাটলে এই টোস্ট দেখাবে
 
     let allTasksStriked = state.columns.every(col => {
