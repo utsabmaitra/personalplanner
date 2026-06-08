@@ -756,7 +756,7 @@ function closeModal() {
     // Service Worker Registration for Offline App
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
+            navigator.serviceWorker.register('./sw.js', { scope: '/personalplanner/' })
                 .then(reg => console.log('Service Worker registered successfully.', reg))
                 .catch(err => console.error('Service Worker registration failed:', err));
         });
